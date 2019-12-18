@@ -2,7 +2,7 @@
 name = "csp"
 version = "0.1.0"
 description = "Content Security Policy making helper."
-keywords = ["CSP", "Content Security Policy"]
+keywords = ["CSP"]
 categories = ["config", "web-programming"]
 
 license = "MIT"
