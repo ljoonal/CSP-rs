@@ -1,0 +1,15 @@
+[package]
+name = "csp"
+version = "0.1.0"
+description = "Content Security Policy making helper."
+keywords = ["CSP", "Content Security Policy"]
+categories = ["config", "web-programming"]
+
+license = "MIT"
+repository = "https://github.com/ljoonal/CSP-rs"
+authors = ["ljoonal"]
+
+edition = "2018"
+
+[badges]
+maintenance = { status = "experimental" }
