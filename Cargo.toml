@@ -11,5 +11,10 @@ authors = ["ljoonal"]
 
 edition = "2018"
 
+[features]
+
+# This can give a minor speedup, but disables checking if the same directive already exists.
+allow_duplicate_directives = []
+
 [badges]
 maintenance = { status = "experimental" }
