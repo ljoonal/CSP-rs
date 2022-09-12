@@ -1,6 +1,6 @@
 [package]
 name = "csp"
-version = "1.0.0"
+version = "1.0.1"
 description = "A small Content Security Policy creation helper."
 keywords = ["CSP"]
 categories = ["config", "web-programming"]

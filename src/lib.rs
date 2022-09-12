@@ -17,21 +17,21 @@
 //! use csp::{CSP, Directive, Sources, Source};
 //!
 //! let csp = CSP::new()
-//!   .add(Directive::ImgSrc(
+//!   .push(Directive::ImgSrc(
 //!     Sources::new_with(Source::Self_)
-//!       .add(Source::Host("https://*.example.org"))
-//!       .add(Source::Host("https://shields.io")),
+//!       .push(Source::Host("https://*.example.org"))
+//!       .push(Source::Host("https://shields.io")),
 //!   ))
-//!   .add(Directive::ConnectSrc(
+//!   .push(Directive::ConnectSrc(
 //!     Sources::new()
-//!       .add(Source::Host("http://crates.io"))
-//!       .add(Source::Scheme("https"))
-//!       .add(Source::Self_),
+//!       .push(Source::Host("http://crates.io"))
+//!       .push(Source::Scheme("https"))
+//!       .push(Source::Self_),
 //!   ))
-//!   .add(Directive::StyleSrc(
-//!     Sources::new_with(Source::Self_).add(Source::UnsafeInline),
+//!   .push(Directive::StyleSrc(
+//!     Sources::new_with(Source::Self_).push(Source::UnsafeInline),
 //!   ))
-//!   .add(Directive::ObjectSrc(Sources::new()));
+//!   .push(Directive::ObjectSrc(Sources::new()));
 //!
 //! let csp_header = "Content-Security-Policy: ".to_owned() + &csp.to_string();
 //! ```
@@ -47,7 +47,6 @@
 #![deny(clippy::cargo)]
 #![warn(missing_docs)]
 #![deny(rustdoc::invalid_html_tags)]
-#![warn(rustdoc::missing_doc_code_examples)]
 #![warn(clippy::pedantic)]
 #![warn(clippy::nursery)]
 
@@ -70,7 +69,7 @@ pub struct CSP<'a>(Vec<Directive<'a>>);
 /// ```rust
 /// use csp::{Sources, Source};
 ///
-/// let sources = Sources::new().add(Source::Self_).add(Source::Scheme("data"));
+/// let sources = Sources::new().push(Source::Self_).push(Source::Scheme("data"));
 ///
 /// assert_eq!(sources.to_string(), "'self' data:");
 /// ```
@@ -83,7 +82,7 @@ pub struct Sources<'a>(Vec<Source<'a>>);
 ///
 /// # Example usage
 /// ```rust
-/// let flash = csp::Plugins::new().add(("application", "x-shockwave-flash"));
+/// let flash = csp::Plugins::new().push(("application", "x-shockwave-flash"));
 /// ```
 ///  to get `application/x-shockwave-flash`
 ///
@@ -95,7 +94,7 @@ pub struct Plugins<'a>(Vec<(&'a str, &'a str)>);
 ///
 /// # Example usage
 /// ```rust
-/// let report_uris = csp::ReportUris::new().add("https://example.org/report");
+/// let report_uris = csp::ReportUris::new().push("https://example.org/report");
 /// ```
 ///
 /// [`Directive`]: Directive
@@ -161,12 +160,12 @@ pub enum Source<'a> {
   /// strings.
   UnsafeEval,
   /// Allows to enable specific inline event handlers. If you only need to
-  /// allow inline event handlers and not inline <script> elements or
+  /// allow inline event handlers and not inline `<script>` elements or
   /// `javascript:` URLs, this is a safer method compared to using the
   /// `unsafe-inline` expression.
   UnsafeHashes,
-  /// Allows the use of inline resources, such as inline \<script> elements,
-  /// javascript: URLs, inline event handlers, and inline <style> elements.
+  /// Allows the use of inline resources, such as inline `<script>` elements,
+  /// javascript: URLs, inline event handlers, and inline <\style> elements.
   UnsafeInline,
   /// A whitelist for specific inline scripts using a cryptographic nonce
   /// (number used once). The server must generate a unique nonce value each
@@ -179,8 +178,8 @@ pub enum Source<'a> {
   /// A sha256, sha384 or sha512 hash of scripts or styles. The use of this
   /// source consists of two portions separated by a dash: the encryption
   /// algorithm used to create the hash and the base64-encoded hash of the
-  /// script or style. When generating the hash, don't include the \<script>
-  /// or \<style> tags and note that capitalization and whitespace matter,
+  /// script or style. When generating the hash, don't include the `<script>`
+  /// or `<style>` tags and note that capitalization and whitespace matter,
   /// including leading or trailing whitespace. See unsafe inline script for
   /// an example. In CSP 2.0 this applied only to inline scripts. CSP 3.0
   /// allows it in the case of `script-src` for external scripts.
@@ -248,16 +247,16 @@ pub enum SandboxAllow {
 #[derive(Debug, Clone)]
 /// A CSP directive.
 pub enum Directive<'a> {
-  /// Restricts the URLs which can be used in a document's \<base> element.
+  /// Restricts the URLs which can be used in a document's `<base>` element.
   ///
   /// If this value is absent, then any URI is allowed. If this directive is
-  /// absent, the user agent will use the value in the \<base> element.
+  /// absent, the user agent will use the value in the `<base>` element.
   BaseUri(Sources<'a>),
   /// Prevents loading any assets using HTTP when the page is loaded using
   /// HTTPS.
   ///
   ///All mixed content resource requests are blocked, including both active
-  /// and passive mixed content. This also applies to \<iframe> documents,
+  /// and passive mixed content. This also applies to `<iframe>` documents,
   /// ensuring the entire page is mixed content free.
   /// The upgrade-insecure-requests directive is evaluated before
   /// block-all-mixed-content and If the former is set, the latter is
@@ -266,7 +265,7 @@ pub enum Directive<'a> {
   /// force it after a redirect to HTTP.
   BlockAllMixedContent,
   /// Defines the valid sources for web workers and nested browsing contexts
-  /// loaded using elements such as \<frame> and \<iframe>.
+  /// loaded using elements such as `<frame>` and `<iframe>`.
   ///
   /// For workers, non-compliant requests are treated as fatal network errors
   /// by the user agent.
@@ -274,14 +273,14 @@ pub enum Directive<'a> {
   /// restricts the URLs which can be loaded using script interfaces. The APIs
   /// that are restricted are:
   ///
-  /// - \<a> ping,
+  /// - `<a>` ping,
   /// - Fetch,
   /// - XMLHttpRequest,
   /// - WebSocket,
   /// - EventSource,
   /// - Navigator.sendBeacon().
   ///
-  /// Note: connect-src 'self' does not resolve to websocket schemas in all browsers, more info: https://github.com/w3c/webappsec-csp/issues/7
+  /// Note: connect-src 'self' does not resolve to websocket schemas in all browsers, more info: <https://github.com/w3c/webappsec-csp/issues/7>
   ConnectSrc(Sources<'a>),
   /// Serves as a fallback for the other CSP fetch directives.
   ///
@@ -313,24 +312,24 @@ pub enum Directive<'a> {
   /// debated and browser implementations of this aspect are inconsistent
   /// (e.g. Firefox 57 doesn't block the redirects whereas Chrome 63 does).
   FormAction(Sources<'a>),
-  /// specifies valid parents that may embed a page using \<frame>, \<iframe>,
-  /// \<object>, \<embed>, or \<applet>.
+  /// specifies valid parents that may embed a page using `<frame>`, `<iframe>`,
+  /// `<object>`, `<embed>`, or `<applet>`.
   ///
   /// Setting this directive to 'none' is similar to X-Frame-Options: deny
   /// (which is also supported in older browsers).
   FrameAncestors(Sources<'a>),
   /// Specifies valid sources for nested browsing contexts loading using
-  /// elements such as \<frame> and \<iframe>.
+  /// elements such as `<frame>` and `<iframe>`.
   FrameSrc(Sources<'a>),
   /// Specifies valid sources of images and favicons.
   ImgSrc(Sources<'a>),
   /// Specifies which manifest can be applied to the resource.
   ManifestSrc(Sources<'a>),
-  /// Specifies valid sources for loading media using the \<audio> and
-  /// \<video> elements.
+  /// Specifies valid sources for loading media using the `<audio>` and
+  /// `<video>` elements.
   MediaSrc(Sources<'a>),
   /// restricts the URLs to which a document can initiate navigations by any
-  /// means including \<form> (if form-action is not specified), \<a>,
+  /// means including `<form>` (if form-action is not specified), `<a>`,
   /// window.location, window.open, etc.
   ///
   /// This is an enforcement on what navigations this document initiates not
@@ -339,22 +338,22 @@ pub enum Directive<'a> {
   /// Note: If the form-action directive is present, the navigate-to directive
   /// will not act on navigations that are form submissions.
   NavigateTo(Sources<'a>),
-  /// specifies valid sources for the \<object>, \<embed>, and \<applet>
+  /// specifies valid sources for the `<object>`, `<embed>`, and `<applet>`
   /// elements.
   ///
-  /// To set allowed types for \<object>, \<embed>, and \<applet> elements,
+  /// To set allowed types for `<object>`, `<embed>`, and `<applet>` elements,
   /// use the PluginTypes.
   ///
   /// Elements controlled by object-src are perhaps coincidentally considered
   /// legacy HTML elements and aren't receiving new standardized features
-  /// (such as the security attributes sandbox or allow for \<iframe>).
+  /// (such as the security attributes sandbox or allow for `<iframe>`).
   /// Therefore it is recommended to restrict this fetch-directive (e.g.
   /// explicitly set object-src 'none' if possible).
   ObjectSrc(Sources<'a>),
   /// Restricts the set of plugins that can be embedded into a document by
   /// limiting the types of resources which can be loaded.
   ///
-  /// Instantiation of an \<embed>, \<object> or \<applet> element will fail
+  /// Instantiation of an `<embed>`, `<object>` or `<applet>` element will fail
   /// if:
   /// - the element to load does not declare a valid MIME type,
   /// - the declared type does not match one of specified types in the
@@ -388,16 +387,18 @@ pub enum Directive<'a> {
   /// report-uri directive, report-to isn’t supported in most browsers yet. So
   /// for compatibility with current browsers while also adding forward
   /// compatibility when browsers get report-to support, you can specify both
-  /// report-uri and report-to: ```text
-  /// Content-Security-Policy: ...; report-uri https://endpoint.com; report-to groupname
-  /// ```
+  /// report-uri and report-to:
+  ///
+  /// > `Content-Security-Policy: ...; report-uri <https://endpoint.com>;
+  /// > report-to groupname`
+  ///
   /// In browsers that support report-to, the report-uri directive will be
   /// ignored.
   ReportUri(ReportUris<'a>),
   /// Instructs the client to require the use of Subresource Integrity for
   /// scripts or styles on the page.
   RequireSriFor(SriFor),
-  /// Enables a sandbox for the requested resource similar to the \<iframe>
+  /// Enables a sandbox for the requested resource similar to the `<iframe>`
   /// sandbox attribute.
   ///
   /// It applies restrictions to a page's actions including preventing popups,
@@ -409,17 +410,17 @@ pub enum Directive<'a> {
   Sandbox(SandboxAllowedList),
   /// Specifies valid sources for JavaScript.
   ///
-  /// This includes not only URLs loaded directly into \<script> elements, but
+  /// This includes not only URLs loaded directly into `<script>` elements, but
   /// also things like inline script event handlers (onclick) and XSLT
   /// stylesheets which can trigger script execution.
   ScriptSrc(Sources<'a>),
   /// Specifies valid sources for JavaScript.
   ///
-  /// This includes not only URLs loaded directly into \<script> elements, but
+  /// This includes not only URLs loaded directly into `<script>` elements, but
   /// also things like inline script event handlers (onclick) and XSLT
   /// stylesheets which can trigger script execution.
   ScriptSrcAttr(Sources<'a>),
-  /// Specifies valid sources for JavaScript \<script> elements, but not
+  /// Specifies valid sources for JavaScript `<script>` elements, but not
   /// inline script event handlers like onclick.
   ScriptSrcElem(Sources<'a>),
   /// specifies valid sources for stylesheets.
@@ -427,7 +428,7 @@ pub enum Directive<'a> {
   /// Specifies valid sources for inline styles applied to individual DOM
   /// elements.
   StyleSrcAttr(Sources<'a>),
-  /// Specifies valid sources for stylesheets \<style> elements and \<link>
+  /// Specifies valid sources for stylesheets `<style>` elements and `<link>`
   /// elements with rel="stylesheet".
   StyleSrcElem(Sources<'a>),
   /// Instructs user agents to restrict usage of known DOM XSS sinks to a
