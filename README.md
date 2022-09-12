@@ -1,7 +1,6 @@
 # CSP-rs
 
-This is a rust crate to help with making a CSP string to be used with webservers.
+This is a very small rust crate to help avoid typos when creating a **C**ontent-**S**ecurity-**P**olicy string.
 
-Any contributions to improve it are welcome, but I'd like to keep this without any external dependencies.
-
-If someon wants to contribute, but doesn't know what to do: the main 'flaws' that I see with this crate is that it allows for repeating the same CSP directive multiple times, and some invalid Sources for some directives.
+Any contributions to improve it are welcome, but keep in mind that the goal of this crate is to be very minimal, and without dependencies.
+This should be kept simple enough that anyone who decides to use this care would do so with the confidence that they could maintain it themselves if needed.
