@@ -684,66 +684,48 @@ impl<'a> ReportUris<'a> {
 
 impl<'a> fmt::Display for Source<'a> {
   fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-    write!(
-      fmt,
-      "{}",
-      match self {
-        Self::Host(s) => s,
-        Self::Scheme(s) => {
-          return write!(fmt, "{}:", s);
-        }
-        Self::Self_ => "'self'",
-        Self::UnsafeEval => "'unsafe-eval'",
-        Self::UnsafeHashes => "'unsafe-hashes'",
-        Self::UnsafeInline => "'unsafe-inline'",
-        Self::Nonce(s) => {
-          return write!(fmt, "'nonce-{}'", s);
-        }
-        Self::Hash((algo, hash)) => {
-          return write!(fmt, "'{}-{}'", algo, hash);
-        }
-        Self::StrictDynamic => "'strict-dynamic'",
-        Self::ReportSample => "'report-sample'",
-      }
-    )
+    match self {
+      Self::Host(s) => write!(fmt, "{}", s),
+      Self::Scheme(s) => write!(fmt, "{}:", s),
+      Self::Self_ => write!(fmt, "'self'"),
+      Self::UnsafeEval => write!(fmt, "'unsafe-eval'"),
+      Self::UnsafeHashes => write!(fmt, "'unsafe-hashes'"),
+      Self::UnsafeInline => write!(fmt, "'unsafe-inline'"),
+      Self::Nonce(s) => write!(fmt, "'nonce-{}'", s),
+      Self::Hash((algo, hash)) => write!(fmt, "'{}-{}'", algo, hash),
+      Self::StrictDynamic => write!(fmt, "'strict-dynamic'"),
+      Self::ReportSample => write!(fmt, "'report-sample'"),
+    }
   }
 }
 
 impl fmt::Display for SandboxAllow {
   fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-    write!(
-      fmt,
-      "{}",
-      match self {
-        Self::DownloadsWithoutUserActivation => "allow-downloads-without-user-activation",
-        Self::Forms => "allow-forms",
-        Self::Modals => "allow-modals",
-        Self::OrientationLock => "allow-orientation-lock",
-        Self::PointerLock => "allow-pointer-lock",
-        Self::Popups => "allow-popups",
-        Self::PopupsToEscapeSandbox => "allow-popups-to-escape-sandbox",
-        Self::Presentation => "allow-presentation",
-        Self::SameOrigin => "allow-same-origin",
-        Self::Scripts => "allow-scripts",
-        Self::StorageAccessByUserActivation => "allow-storage-access-by-user-activation",
-        Self::TopNavigation => "allow-top-navigation",
-        Self::TopNavigationByUserActivation => "allow-top-navigation-by-user-activation",
-      }
-    )
+    match self {
+      Self::DownloadsWithoutUserActivation => write!(fmt, "allow-downloads-without-user-activation"),
+      Self::Forms => write!(fmt, "allow-forms"),
+      Self::Modals => write!(fmt, "allow-modals"),
+      Self::OrientationLock => write!(fmt, "allow-orientation-lock"),
+      Self::PointerLock => write!(fmt, "allow-pointer-lock"),
+      Self::Popups => write!(fmt, "allow-popups"),
+      Self::PopupsToEscapeSandbox => write!(fmt, "allow-popups-to-escape-sandbox"),
+      Self::Presentation => write!(fmt, "allow-presentation"),
+      Self::SameOrigin => write!(fmt, "allow-same-origin"),
+      Self::Scripts => write!(fmt, "allow-scripts"),
+      Self::StorageAccessByUserActivation => write!(fmt, "allow-storage-access-by-user-activation"),
+      Self::TopNavigation => write!(fmt, "allow-top-navigation"),
+      Self::TopNavigationByUserActivation => write!(fmt, "allow-top-navigation-by-user-activation"),
+    }
   }
 }
 
 impl fmt::Display for SriFor {
   fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
-    write!(
-      fmt,
-      "{}",
-      match self {
-        Self::Script => "script",
-        Self::Style => "style",
-        Self::ScriptStyle => "script style",
-      }
-    )
+    match self {
+      Self::Script => write!(fmt, "script"),
+      Self::Style => write!(fmt, "style"),
+      Self::ScriptStyle => write!(fmt, "script style"),
+    }
   }
 }
 
@@ -768,21 +750,20 @@ impl<'a> fmt::Display for Directive<'a> {
       Self::PrefetchSrc(s) => write!(fmt, "prefetch-src {}", s),
       Self::ReportTo(s) => write!(fmt, "report-to {}", s),
       Self::ReportUri(uris) => {
-        let mut directive = "report-uri ".to_owned();
+        write!(fmt, "report-uri ")?;
 
         for uri in &uris.0[0..uris.0.len() - 1] {
-          directive.push_str(uri);
-          directive.push(' ');
+          write!(fmt, "{} ", uri)?;
         }
 
-        directive.push_str(uris.0[uris.0.len() - 1]);
-
-        write!(fmt, "{}", directive)
+        let last = uris.0[uris.0.len() - 1];
+        write!(fmt, "{}", last)
       }
       Self::RequireSriFor(s) => write!(fmt, "require-sri-for {}", s),
-      Self::Sandbox(s) => match s.0.len() {
-        0 => write!(fmt, "sandbox"),
-        _ => write!(fmt, "sandbox {}", s),
+      Self::Sandbox(s) => if s.0.is_empty() {
+        write!(fmt, "sandbox")
+      } else {
+        write!(fmt, "sandbox {}", s)
       },
       Self::ScriptSrc(s) => write!(fmt, "script-src {}", s),
       Self::ScriptSrcAttr(s) => write!(fmt, "script-src-attr {}", s),
@@ -791,16 +772,14 @@ impl<'a> fmt::Display for Directive<'a> {
       Self::StyleSrcAttr(s) => write!(fmt, "style-src-attr {}", s),
       Self::StyleSrcElem(s) => write!(fmt, "style-src-elem {}", s),
       Self::TrustedTypes(trusted_types) => {
-        let mut directive = "trusted-types ".to_owned();
+        write!(fmt, "trusted-types ")?;
 
         for trusted_type in &trusted_types[0..trusted_types.len() - 1] {
-          directive.push_str(trusted_type);
-          directive.push(' ');
+          write!(fmt, "{} ", trusted_type)?;
         }
 
-        directive.push_str(trusted_types[trusted_types.len() - 1]);
-
-        write!(fmt, "{}", directive)
+        let last = trusted_types[trusted_types.len() - 1];
+        write!(fmt, "{}", last)
       }
       Self::UpgradeInsecureRequests => write!(fmt, "upgrade-insecure-requests"),
       Self::WorkerSrc(s) => write!(fmt, "worker-src {}", s),
@@ -813,17 +792,13 @@ impl<'a> fmt::Display for Plugins<'a> {
     if self.0.is_empty() {
       return write!(fmt, "");
     }
-    let mut formatted_string = String::new();
 
     for plugin in &self.0[0..self.0.len() - 1] {
-      formatted_string.push_str(&format!("{}/{}", plugin.0, plugin.1));
-      formatted_string.push(' ');
+      write!(fmt, "{}/{} ", plugin.0, plugin.1)?;
     }
 
     let last = &self.0[self.0.len() - 1];
-
-    formatted_string.push_str(&format!("{}/{}", last.0, last.1));
-    write!(fmt, "{}", formatted_string)
+    write!(fmt, "{}/{}", last.0, last.1)
   }
 }
 
@@ -833,15 +808,12 @@ impl<'a> fmt::Display for Sources<'a> {
       return write!(fmt, "'none'");
     }
 
-    let mut formatted_string = String::new();
-
     for source in &self.0[0..self.0.len() - 1] {
-      formatted_string.push_str(&source.to_string());
-      formatted_string.push(' ');
+      write!(fmt, "{} ", source)?;
     }
 
-    formatted_string.push_str(&self.0[self.0.len() - 1].to_string());
-    write!(fmt, "{}", formatted_string)
+    let last = &self.0[self.0.len() - 1];
+    write!(fmt, "{}", last)
   }
 }
 
@@ -851,15 +823,12 @@ impl fmt::Display for SandboxAllowedList {
       return write!(fmt, "");
     }
 
-    let mut formatted_string = String::new();
-
     for directive in &self.0[0..self.0.len() - 1] {
-      formatted_string.push_str(&directive.to_string());
-      formatted_string.push(' ');
+      write!(fmt, "{} ", directive)?;
     }
 
-    formatted_string.push_str(&self.0[self.0.len() - 1].to_string());
-    write!(fmt, "{}", formatted_string)
+    let last = &self.0[self.0.len() - 1];
+    write!(fmt, "{}", last)
   }
 }
 
@@ -869,15 +838,12 @@ impl<'a> fmt::Display for CSP<'a> {
       return write!(fmt, "");
     }
 
-    let mut formatted_string = String::new();
-
     for directive in &self.0[0..self.0.len() - 1] {
-      formatted_string.push_str(&directive.to_string());
-      formatted_string.push_str("; ");
+      write!(fmt, "{}; ", directive)?;
     }
 
-    formatted_string.push_str(&self.0[self.0.len() - 1].to_string());
-    write!(fmt, "{}", formatted_string)
+    let last = &self.0[self.0.len() - 1];
+    write!(fmt, "{}", last)
   }
 }
 
