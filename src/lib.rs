@@ -702,7 +702,9 @@ impl<'a> fmt::Display for Source<'a> {
 impl fmt::Display for SandboxAllow {
   fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
     match self {
-      Self::DownloadsWithoutUserActivation => write!(fmt, "allow-downloads-without-user-activation"),
+      Self::DownloadsWithoutUserActivation => {
+        write!(fmt, "allow-downloads-without-user-activation")
+      }
       Self::Forms => write!(fmt, "allow-forms"),
       Self::Modals => write!(fmt, "allow-modals"),
       Self::OrientationLock => write!(fmt, "allow-orientation-lock"),
@@ -712,9 +714,13 @@ impl fmt::Display for SandboxAllow {
       Self::Presentation => write!(fmt, "allow-presentation"),
       Self::SameOrigin => write!(fmt, "allow-same-origin"),
       Self::Scripts => write!(fmt, "allow-scripts"),
-      Self::StorageAccessByUserActivation => write!(fmt, "allow-storage-access-by-user-activation"),
+      Self::StorageAccessByUserActivation => {
+        write!(fmt, "allow-storage-access-by-user-activation")
+      }
       Self::TopNavigation => write!(fmt, "allow-top-navigation"),
-      Self::TopNavigationByUserActivation => write!(fmt, "allow-top-navigation-by-user-activation"),
+      Self::TopNavigationByUserActivation => {
+        write!(fmt, "allow-top-navigation-by-user-activation")
+      }
     }
   }
 }
@@ -760,11 +766,13 @@ impl<'a> fmt::Display for Directive<'a> {
         write!(fmt, "{}", last)
       }
       Self::RequireSriFor(s) => write!(fmt, "require-sri-for {}", s),
-      Self::Sandbox(s) => if s.0.is_empty() {
-        write!(fmt, "sandbox")
-      } else {
-        write!(fmt, "sandbox {}", s)
-      },
+      Self::Sandbox(s) => {
+        if s.0.is_empty() {
+          write!(fmt, "sandbox")
+        } else {
+          write!(fmt, "sandbox {}", s)
+        }
+      }
       Self::ScriptSrc(s) => write!(fmt, "script-src {}", s),
       Self::ScriptSrcAttr(s) => write!(fmt, "script-src-attr {}", s),
       Self::ScriptSrcElem(s) => write!(fmt, "script-src-elem {}", s),
