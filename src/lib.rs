@@ -159,6 +159,8 @@ pub enum Source<'a> {
   /// Allows the use of `eval()` and similar methods for creating code from
   /// strings.
   UnsafeEval,
+  /// Allows the compilation and instantiation of WebAssembly.
+  WasmUnsafeEval,
   /// Allows to enable specific inline event handlers. If you only need to
   /// allow inline event handlers and not inline `<script>` elements or
   /// `javascript:` URLs, this is a safer method compared to using the
@@ -689,6 +691,7 @@ impl<'a> fmt::Display for Source<'a> {
       Self::Scheme(s) => write!(fmt, "{}:", s),
       Self::Self_ => write!(fmt, "'self'"),
       Self::UnsafeEval => write!(fmt, "'unsafe-eval'"),
+      Self::WasmUnsafeEval => write!(fmt, "'wasm-unsafe-eval'"),
       Self::UnsafeHashes => write!(fmt, "'unsafe-hashes'"),
       Self::UnsafeInline => write!(fmt, "'unsafe-inline'"),
       Self::Nonce(s) => write!(fmt, "'nonce-{}'", s),
@@ -902,6 +905,7 @@ mod tests {
         .push(Source::ReportSample)
         .push(Source::StrictDynamic)
         .push(Source::UnsafeEval)
+        .push(Source::WasmUnsafeEval)
         .push(Source::UnsafeHashes)
         .push(Source::UnsafeInline)
         .push(Source::Scheme("data"))
@@ -911,7 +915,7 @@ mod tests {
 
     assert_eq!(
       csp.to_string(),
-      "script-src 'sha256-1234a' 'nonce-5678b' 'report-sample' 'strict-dynamic' 'unsafe-eval' 'unsafe-hashes' 'unsafe-inline' data: https://example.org 'self'"
+      "script-src 'sha256-1234a' 'nonce-5678b' 'report-sample' 'strict-dynamic' 'unsafe-eval' 'wasm-unsafe-eval' 'unsafe-hashes' 'unsafe-inline' data: https://example.org 'self'"
     );
   }
 
